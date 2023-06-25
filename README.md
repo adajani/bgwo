@@ -19,7 +19,7 @@ $ make -j4
 ```
 If the compilation process proceeds successfully, you will see "bgwo" binary under build directory.
 
-# Benchmark usage:
+# Usage:
 ```
 Binary grey wolf optimizer for feature selection
 ./bgwo -file [-population_size] [-iterations] [-split] [-debug]
@@ -32,13 +32,21 @@ where:
     -debug              [optinal ]    Show debugging info, defualt(false)
 ```
 
-## Example
+# How to Run
 ```
 $ build/bgwo -file dataset/zoo.dat -population_size 100 -iterations 1000
 ```
 
+# Unittest:
+Locate the root source code, then type the folowing:
+```
+$ make unittest
+$ ./build/unittest
+```
+Note: The unittest is based on Google gtest.
+
 # Author
-Ahmed Dajani
+Ahmed Dajani,
 Email: adajani@iastate.edu
 
 # Reference

@@ -31,7 +31,6 @@ Argument *argument = nullptr;
 DataSet *dataset = nullptr;
 Fitness *fitness = nullptr;
 
-Array *entireDataset = nullptr;
 Array *training = nullptr;
 Array *testing = nullptr;
 BGWO *bgwo = nullptr;
