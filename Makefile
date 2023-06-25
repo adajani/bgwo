@@ -58,3 +58,6 @@ perf:
 clean:
 	@$(RM) -rf $(BLD_DIR)/*.o
 	@$(RM) -rf $(BLD_DIR)/bgwo*
+	@$(RM) -rf callgrind.out.*
+	@$(RM) -rf gmon.out
+	@$(RM) -rf output.svg
