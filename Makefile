@@ -51,9 +51,8 @@ $(BLD_DIR)/%.o: $(UNITTEST_SRC_DIR)/%.cc
 	$(CC) $(CPPFLAGS) $(UNITTEST_CPP_FLAGS) -c $< -o $@
 
 perf:
-	#note change callgrind.out.2222
 	valgrind --tool=callgrind $(BLD_DIR)/bgwo -file ./dataset/zoo.dat
-	python3 -m gprof2dot -f callgrind callgrind.out.2222 | dot -Tsvg -o output.svg
+	ls -t callgrind.out.* | head -n1 | xargs python3 -m gprof2dot -f callgrind | dot -Tsvg -o output.svg
 
 clean:
 	@$(RM) -rf $(BLD_DIR)/*.o
