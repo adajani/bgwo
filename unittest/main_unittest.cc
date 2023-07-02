@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include <dataset_fixture.hpp>
+#include <knn_fixture.hpp>
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

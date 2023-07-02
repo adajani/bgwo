@@ -25,7 +25,7 @@ Fitness::Fitness(Array *training, Array *testing) {
     this->training_m = training;
     this->testing_m = testing;
     this->dim_m = training->getCol();
-    this->predictions_m = new long double[this->training_m->getRow()];
+    this->predictions_m = new long double[this->testing_m->getRow()];
 }
 
 Fitness::~Fitness() {
@@ -49,9 +49,9 @@ long double Fitness::calculate(long double *x) {
 
     for(int index=0; index<this->testing_m->getRow(); index++) {
         neighbors = Knn::getNeighbors(this->training_m, 
-                                       this->testing_m->getData()[index], 
-                                       x,
-                                       this->k_m);
+                                      this->testing_m->getData()[index], 
+                                      x,
+                                      this->k_m);
         c = Knn::getResponse(neighbors);
         delete neighbors;
         this->predictions_m[index] = c;
