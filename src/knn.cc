@@ -23,58 +23,68 @@
 
 /* Returns k most similar neighbors from the training set for a given 
  * test instance (using the already defined euclideanDistance function) */
-Array *Knn::getNeighbors(Array *training, long double *testing, long double *features, int k) {
-    Distance *distances = new Distance[training->getRow()];
-
-    Array *neighbors = new Array(k, training->getCol());
+std::vector<Distance> Knn::getNeighbors(Array *training, long double *testing, long double *features, int k) {
+    std::vector<Distance> distances(training->getRow());
+    std::vector<Distance> neighbors(k);
 
     for(int y=0; y<training->getRow(); y++) {
         long double dist = Utils::euclideanDistance(training->getData()[y],
-                                                     testing,
-                                                     features,
-                                                     training->getCol()-1);
-
-        distances[y].distance_value = dist;
-        distances[y].array = new long double[training->getCol()];
-        std::copy(&training->getData()[y][0], 
-                  &training->getData()[y][training->getCol()],
-                  distances[y].array);
+                                                    testing,
+                                                    features,
+                                                    training->getCol()-1);
+        distances.at(y) = {dist, training->getData()[y][training->getCol()-1]};
     }
 
-    std::sort(&distances[0], &distances[training->getRow()], 
-              [](Distance left, Distance right){ return left.distance_value < right.distance_value;});
-
-    for(int y=0; y<k; y++) {
-        std::copy(&distances[y].array[0],
-                  &distances[y].array[training->getCol()],
-                  neighbors->getData()[y]);
-    }
-
-    //delete temp. distances
-    for(int y=0; y<training->getRow(); y++) {
-        delete []distances[y].array;
-    }
-    delete []distances;
-
+    std::sort(distances.begin(), distances.end());
+    std::copy(distances.begin(), distances.begin()+k, neighbors.begin());
+    
     return neighbors;
 }
 
-/* Function for getting the majority voted response from a number of neighbors. 
- * It assumes the class is the last attribute for each neighbor. */
-long double Knn::getResponse(Array *neighbors) {
-    std::map<long double, int> class_votes;
+std::pair<long double, VoteInformation> Knn::getMaxVoteCount(const std::map<long double, VoteInformation> &x) {
+    using pairtype=std::pair<long double, VoteInformation>; 
+    return *std::max_element(x.begin(), x.end(), [] (const pairtype &p1, const pairtype &p2) {
+        return p1.second.voteCount < p2.second.voteCount;
+    });
+}
 
-    for(int y=0; y<neighbors->getRow(); y++) {
-        long double response = neighbors->getData()[y][neighbors->getCol()-1];
-        if(class_votes.find(response) == class_votes.end()) {
-            class_votes[response] = 1; //not found
+std::pair<long double, VoteInformation> Knn::getMinDistance(const std::map<long double, VoteInformation> &x) {
+    using pairtype=std::pair<long double, VoteInformation>; 
+    return *std::max_element(x.begin(), x.end(), [] (const pairtype &p1, const pairtype &p2) {
+        return p1.second.distance > p2.second.distance;
+    });
+}
+
+/* Function for getting the majority voted response from a number of neighbors. */
+long double Knn::getResponse(std::vector<Distance> neighbors) {
+    std::map<long double, VoteInformation> class_votes;
+
+    //count the label frequency 
+    for(auto &neighbor : neighbors) {
+        long double response = neighbor.label;
+        if(class_votes.find(response) == class_votes.end()) { //not found
+            class_votes[response] = {.voteCount=1, .distance=neighbor.distanceValue};
         } else {
-            class_votes[response] += 1;
+            class_votes[response].voteCount += 1;
         }
     }
 
-    //get max voted class
-    return Utils::hashmapGetMax(class_votes).first;
+    auto firstMax = Knn::getMaxVoteCount(class_votes);
+    if(class_votes.size() > 1) {//at least two keys
+        //remove the highest rated label
+        class_votes.erase(firstMax.first);
+        //get the second heightst label count
+        auto secondMax = Knn::getMaxVoteCount(class_votes);
+        //if the first two labels share the same count
+        if(firstMax.second.voteCount == secondMax.second.voteCount) {
+            //return the first voted label to the map
+            class_votes.insert({firstMax.first, firstMax.second});
+            //return the label with lowest distance
+            return Knn::getMinDistance(class_votes).first;
+        }
+    }
+    //return the heightst label count
+    return firstMax.first;
 }
 
 /* Function that sums the total correct predictions and returns the accuracy 

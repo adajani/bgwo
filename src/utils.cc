@@ -19,9 +19,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <utils.hpp>
+#include <cassert>
 
 // Calculate the similarity between any two given data instances. 
 long double Utils::euclideanDistance(long double *instance1, long double *instance2, long double *features, int length) {
+    assert (instance1 != nullptr);
+    assert (instance2 != nullptr);
+    assert (features != nullptr);
     long double distance = 0.0;
     for(int x=0; x<length; x++) {
         if(features[x] == 1) {
@@ -29,14 +33,6 @@ long double Utils::euclideanDistance(long double *instance1, long double *instan
         }
     }
     return sqrtl(distance);
-}
-
-// Get max value in hashmap
-std::pair<long double, int> Utils::hashmapGetMax(const std::map<long double, int> &x) {
-    using pairtype=std::pair<long double, int>; 
-    return *std::max_element(x.begin(), x.end(), [] (const pairtype &p1, const pairtype &p2) {
-        return p1.second < p2.second;
-    });
 }
 
 // Convert array into binary, where each item >0.5 will be 1 else 0

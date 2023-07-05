@@ -30,15 +30,13 @@
 
     class KnnTest : public Test {
         protected:
-            const std::string fileName = "./unittest/5x6dataset.dat";
             const float trainingPercent = 0.5;
-            const int numberOfFeatures = 6;
             DataSet *dataset = nullptr;
             Array *training = nullptr;
             Array *testing = nullptr;            
         public:
-            void SetUp() override {
-                dataset = new DataSet(this->fileName);
+            void SetUp(std::string fileName) {
+                dataset = new DataSet(fileName);
                 dataset->load();
                 dataset->split(this->trainingPercent);
                 training = dataset->getTraining();

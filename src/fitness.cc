@@ -38,7 +38,7 @@ float Fitness::getAccuracy() {
 
 long double Fitness::calculate(long double *x) {
     long double c;
-    Array *neighbors;
+    std::vector<Distance> neighbors;
 
     long double *array = Utils::convertArrayToBinary(x, this->dim_m);
     long double sum = Utils::arraySum(array, this->dim_m);
@@ -53,7 +53,6 @@ long double Fitness::calculate(long double *x) {
                                       x,
                                       this->k_m);
         c = Knn::getResponse(neighbors);
-        delete neighbors;
         this->predictions_m[index] = c;
     }
 

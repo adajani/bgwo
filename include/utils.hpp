@@ -23,16 +23,12 @@
     #include <algorithm>
     #include <iostream>
     #include <cstring>
-    #include <map>
     #include <dataset.hpp>
 
     class Utils {
         public:
             // Calculate the similarity between any two given data instances. 
             static long double euclideanDistance(long double *instance1, long double *instance2, long double *features, int length);
-
-            // Get max value in hashmap
-            static std::pair<long double, int> hashmapGetMax(const std::map<long double, int> &x);
 
             // Convert array into binary, where each item >0.5 will be 1 else 0
             static long double *convertArrayToBinary(long double *array, int size);

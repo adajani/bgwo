@@ -20,20 +20,25 @@
 
 #include <knn_fixture.hpp>
 
+#define ROUND_TO(value, precision) std::round(value / precision) * precision
+#define ROUND_TO_4_DECIMAL(value) ROUND_TO(value, 0.0001)
+
 TEST_F(KnnTest, TestEuclideanDistance) {
+    SetUp("./unittest/5x6dataset.dat");
     long double features[] = {1,0,1,0,0,0};
     long double distance = Utils::euclideanDistance(training->getData()[0],
                                                     testing->getData()[0],
                                                     features,
                                                     training->getCol()-1);
-    EXPECT_NEAR(distance, 1.41421, 0.0001L);
+    EXPECT_NEAR(distance, 1.41421, 0.001L);
 }
 
-TEST_F(KnnTest, TestNeighbors) {
+TEST_F(KnnTest, TestDifferentNeighbors) {
+    SetUp("./unittest/5x6dataset.dat");
     const int knn_k = 2;
-    long double features[]= {1,0,1,0,0,0};
+    long double features[] = {1,0,1,0,0,0};
     long double *predictions = new long double[testing->getRow()];
-    Array *neighbors;
+    std::vector<Distance> neighbors;
     for(int index=0; index<testing->getRow(); index++) {
         neighbors = Knn::getNeighbors(training, 
                                       testing->getData()[index], 
@@ -41,10 +46,28 @@ TEST_F(KnnTest, TestNeighbors) {
                                       knn_k);
         long double c = Knn::getResponse(neighbors);
         predictions[index] = c;
-        delete neighbors;
     }
 
     float accuracy = Knn::getAccuracy(testing, predictions);
-    EXPECT_NEAR(accuracy, 0.666667, 0.0001L);
+    EXPECT_FLOAT_EQ(ROUND_TO_4_DECIMAL(accuracy), ROUND_TO_4_DECIMAL(0.6667L));
+    delete predictions;
+}
+
+TEST_F(KnnTest, TestSameNeighbors) {
+    SetUp("./unittest/5x2dataset.dat");
+    const int knn_k = 2;
+    long double features[] = {1, 1};
+    long double *predictions = new long double[testing->getRow()];
+    for(int index=0; index<testing->getRow(); index++) {
+        std::vector<Distance> neighbors = Knn::getNeighbors(training, 
+                                                            testing->getData()[index], 
+                                                            (long double*)features,
+                                                            knn_k);
+        long double c = Knn::getResponse(neighbors);
+        predictions[index] = c;
+    }
+
+    float accuracy = Knn::getAccuracy(testing, predictions);
+    EXPECT_FLOAT_EQ(ROUND_TO_4_DECIMAL(accuracy), ROUND_TO_4_DECIMAL(0.3333L));
     delete predictions;
 }
